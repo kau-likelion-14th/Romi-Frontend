@@ -1,41 +1,41 @@
 .footer {
     background: rgba(229, 248, 241, 0.72);
-    padding: 40px 80px;       /* 위아래, 좌우 여백 */
-    color: #000000;              /* 글자색 */
-    font-size: 14px;          /* 전체적인 글자 크기 */
+    padding: 40px 80px;       
+    color: #000000;             
+    font-size: 14px;          
     line-height: 1.6; 
     font-family: "Paperlogy", sans-serif;        
 }
 
 .footer-top {
-    display: flex;            /* 로고와 글자를 옆으로 나란히 */
-    align-items: center;      /* 세로 중앙 정렬 */
-    margin-bottom: 20px;      /* 아래 문구와의 간격 */
+    display: flex;            
+    align-items: center;      
+    margin-bottom: 20px;      
 }
 
 .footer-logo {
-    width: 35px;              /* 로고 크기 조절 */
+    width: 35px;              
     margin-right: 20px;
 }
 
 .footer-title {
-    font-weight: 700;        /* 제목 강조 */
+    font-weight: 700;        
     font-size: 18px;
 }
 
 .footer-description {
-    font-weight: 500;        /* 설명 문구 강조 */
+    font-weight: 500;        
     margin-bottom: 15px;
     color: #797979;
 }
 
 .footer-info-grid {
-    display: flex;            /* 정보들을 옆으로 나열 */
-    flex-wrap: wrap;          /* 자리가 부족하면 다음 줄로 */
-    gap: 5px 15px;           /* 항목 간의 간격 (위아래 10px, 좌우 40px) */
+    display: flex;            
+    flex-wrap: wrap;         
+    gap: 5px 15px;          
 }
 
 .info-item span {
-    color: #797979;              /* '상호명:', '대표자:' 같은 라벨은 조금 연하게 */
+    color: #797979;             
     margin-right: 5px;
 }
