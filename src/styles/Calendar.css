@@ -54,6 +54,7 @@
 .calendar-container .react-calendar__tile {
     height: 80px;
     border-radius: 15px;
+    overflow: hidden;
 }
 
 .calendar-container .react-calendar__tile::after {
