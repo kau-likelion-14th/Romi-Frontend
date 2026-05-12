@@ -67,7 +67,7 @@ function Profile() {
           <span>🎵</span>
           <input
             type="text"
-            placeholder="Ode to Love - NCT Wish"
+            placeholder="제목 - 가수"
             value={song}
             onChange={(e) => setSong(e.target.value)}
             className="profile-input"

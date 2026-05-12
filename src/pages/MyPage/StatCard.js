@@ -1,3 +1,4 @@
+import React from "react";
 function StatCard({ stats }) {
   const { icon, title, statistics } = stats;
 
