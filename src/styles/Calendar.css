@@ -55,6 +55,7 @@
     height: 80px;
     border-radius: 15px;
     overflow: hidden;
+    position: relative;
 }
 
 .calendar-container .react-calendar__tile::after {
@@ -82,8 +83,10 @@
 
 .tile-meta {
   position: absolute;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
+  font-size: 11px;
 }
 
 .tile-done .tile-meta{
