@@ -1,3 +1,4 @@
+import React from "react";
 import Profile from "./Profile.js";
 import Status from "./Status.js";
 import "../../styles/MyPage.css";

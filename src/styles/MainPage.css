@@ -14,6 +14,7 @@
   width: 100%; /* 고정 440px 해제 */
   max-width: 440px; /* 최대 너비만 제한 */
   margin-right: 0; /* 기존 200px 제거 */
+  overflow: hidden;
 }
 
 /* 투두 컨테이너 유연화 */
@@ -63,3 +64,4 @@
     gap: 10px;
   }
 }
+
