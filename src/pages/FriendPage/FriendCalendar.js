@@ -1,87 +1,66 @@
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import React, { useState } from "react";
+import React from "react";
 import "../../styles/Calendar.css";
 
-// Date → "YYYY-MM-DD" 변환 
+// 날짜를 달력 응답의 날짜 키와 같은 형식으로 변환
 const toDateKey = (date) => {
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0"); // 월은 0-based라 +1
+  const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 };
 
-// 날짜별 할 일 데이터 (YYYY-MM-DD)
-const dummyTodosByDate = {
-  "2026-05-04": [
-    { id: 1, title: "프론트 보충자료 읽기", completed: true },
-    { id: 2, title: "FriendCalendar 주석 달기", completed: false },
-  ],
-  "2026-05-06": [
-    { id: 3, title: "친구 페이지 과제 제출", completed: true },
-  ],
-  "2026-05-10": [
-    { id: 4, title: "React 복습하기", completed: false },
-    { id: 5, title: "props 정리하기", completed: false },
-    { id: 6, title: "useState 정리하기", completed: true },
-  ],
-};
-
-export default function FriendCalendar() {
-  // useState: 선택된 날짜를 기억 → 바뀌면 캘린더가 해당 날짜 선택 상태로 리렌더링
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // 날짜 클릭 시 실행 → selectedDate 업데이트 (범위 선택 방어 처리 포함)
-  const handleDateChange = (value) => {
-    const next = value instanceof Date ? value : value?.[0];
-    if (!next) return;
-    setSelectedDate(next);
-  };
-
-  // 특정 날짜의 할 일 상태 계산 → tileContent·tileClassName에서 타일 표시 결정에 사용
+export default function FriendCalendar({
+  initialDate,
+  onDateChange,
+  onMonthChange,
+  remainingByDate = {},
+}) {
   const getDayMeta = (date) => {
-    const key = toDateKey(date);
-    const list = dummyTodosByDate[key] ?? [];
-
-    if (list.length === 0) return { hasTodos: false, remaining: 0, allDone: false };
-
-    // filter로 미완료 항목 수 계산
-    const remaining = list.filter((todo) => !todo.completed).length;
+    const day = remainingByDate[toDateKey(date)];
 
     return {
-      hasTodos: true,
-      remaining,
-      allDone: remaining === 0,
+      hasTodos: day?.hasTodo === true,
+      remaining: day?.remaining ?? 0,
+      allDone: day?.hasTodo === true && day?.remaining === 0,
     };
   };
 
   return (
     <div className="calendar-container">
       <Calendar
-        onChange={handleDateChange} // 클릭 → selectedDate state 변경
-        value={selectedDate}        // state값을 캘린더에 반영 (선택 날짜 표시)
+        onChange={(value) => onDateChange?.(value instanceof Date ? value : value?.[0])}
+        onActiveStartDateChange={({ activeStartDate }) => onMonthChange?.(activeStartDate)} // 월 변경 시 실행될 함수 연결
+        value={initialDate} // 현재 선택된 날짜 반영
         calendarType="gregory"
         view="month"
         prev2Label={null}
         next2Label={null}
         showNeighboringMonth={true}
         formatDay={(locale, date) => String(date.getDate())}
-
-        // tileContent: 타일 안 콘텐츠 결정
-        // getDayMeta 결과에 따라 → 할 일 없으면 null / 전부 완료면 "★" / 미완료면 남은 개수
+        
+        // 각 날짜 타일(칸) 안에 들어갈 추가 내용을 정의 함
         tileContent={({ date, view }) => {
           if (view !== "month") return null;
+
+          // 해당 날짜의 할 일 상태를 가져옴
           const { hasTodos, remaining, allDone } = getDayMeta(date);
           if (!hasTodos) return null;
+
+          // 모두 완료했으면 별표, 남은 일이 있으면 숫자를 표시 함
           return <div className="tile-meta">{allDone ? "★" : remaining}</div>;
         }}
 
-        // tileClassName: 타일 배경색 클래스 결정
-        // "tile-done"(전부 완료) / "tile-has"(미완료 있음)
+        // 각 날짜 타일에 적용할 CSS 클래스를 동적으로 결정 함
         tileClassName={({ date, view }) => {
           if (view !== "month") return "";
+
           const { hasTodos, allDone } = getDayMeta(date);
           if (!hasTodos) return "";
+
+          // 모두 완료했으면 'tile-done', 할 일이 남아있으면 'tile-has' 클래스 적용
+          // 이 클래스들에 따라 달력의 배경색 등이 변경 됨
           return allDone ? "tile-done" : "tile-has";
         }}
       />
