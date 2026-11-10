@@ -1,7 +1,7 @@
 import "../styles/Header.css";
 import logo from "../assets/image/lte.png";
 import LogoutIcon from "../assets/icon/exit.png";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import api from "../Api";
 import config from "../Config";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { useState } from "react";
 
 function Header() {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [loggingOut, setLoggingOut] = useState(false);
 
     let userName = "";
@@ -46,15 +47,16 @@ function Header() {
             setLoggingOut(false); 
     }
     }
+
+    if (pathname === "/login") return null;
+
     return (
         <header className="header">
-            {/*로고*/}
             <div className="header-left">
                 <img src={logo} alt="LTE 로고" className="header-logo"/>
                 <span className="header-title">Lion To-do Everyday</span>
             </div>
 
-            {/*메뉴*/}
             <nav className="header-nav">
                 <NavLink to = "/" className= {({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                 홈
@@ -69,7 +71,6 @@ function Header() {
                 </NavLink>
             </nav>
 
-            {/*사용자정보*/}
             <div className="header-right">
                 <span className="user-name">{userName ? `${userName}님` : ""}</span>
                 <img src={LogoutIcon} alt="로그아웃" className="logout-icon" onClick={handleLogout}/>

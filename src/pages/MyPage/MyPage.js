@@ -3,12 +3,12 @@ import Profile from "./Profile.js";
 import Status from "./Status.js";
 import "../../styles/MyPage.css";
 
-function MyPage() {
+const MyPage = () => {
   return (
-    <div className="mypage-container">
+    <main className="mypage-container">
       <Profile />
       <Status />
-    </div>
+    </main>
   );
 }
 

@@ -9,7 +9,7 @@ const TodoModal = ({
     onSave, 
     onDelete, 
     initialTodo,
-    categories
+    categories = {}
 }) => {
     const isEditMode = Boolean(initialTodo); 
 
@@ -22,10 +22,10 @@ const TodoModal = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        setCategory(initialTodo?.category || "공부");
+        setCategory(initialTodo?.category || Object.keys(categories)[0] || "");
         setText(initialTodo?.text || "");
         setRoutine(initialTodo?.routine || null);
-    }, [isOpen, initialTodo]);
+    }, [isOpen, initialTodo, categories]);
 
     if (!isOpen) return null;
 
@@ -53,6 +53,7 @@ const TodoModal = ({
                 <div className="modal-section">
                     <div className="modal-label">카테고리</div>
                     <div className="modal-categories">
+                        {categoryKeys.length === 0 && <div>카테고리가 없습니다</div>}
                         {categoryKeys.map((c) => (
                             <label
                                 key={c}

@@ -52,6 +52,7 @@
 }
 
 .calendar-container .react-calendar__tile {
+    position: relative;
     height: 80px;
     border-radius: 15px;
     overflow: hidden;
@@ -82,12 +83,21 @@
 
 .tile-meta {
   position: absolute;
+  top: 56px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .tile-done .tile-meta{
     color: hsl(59, 100%, 50%);
+}
+
+.calendar-container .tile-has .tile-meta {
+    color: #333333;
+    font-weight: 700;
 }
 
 .calendar-container .react-calendar__tile--active abbr,

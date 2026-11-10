@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import FriendPage from './pages/FriendPage/FriendPage';
 import FriendDetailPage from './pages/FriendPage/FriendDetailPage';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import MyPage from './pages/MyPage/MyPage';
 
 function App() {
   const location = useLocation(); 
@@ -34,6 +35,7 @@ function App() {
           <Route element = {<ProtectedRoute />} />
           <Route path="/friends" element={<FriendPage />} />
           <Route path="/friends/:id" element={<FriendDetailPage />} />
+          <Route path ="/mypage" element={<MyPage />} />
         </Route>
         
       </Routes>
