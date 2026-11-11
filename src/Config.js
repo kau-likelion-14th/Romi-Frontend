@@ -19,6 +19,28 @@ const config = {
         CREATE: "/api/follow",
     },
 
+    PROFILE: {
+      GET: "/api/prifile",
+      PUT:"/api/prifile",
+      DELETE:"/api/prifile",
+      INTRO: "/api/prifile/intro",
+    },
+
+    CALENDAR: {
+        GET: "/api/todos/calendar",
+    },
+
+    TODOS: {
+        LIST: "/api/todos",
+        UPDATE: (todoId) => `/api/todos/${todoId}`,
+        DELETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}`,
+        TOGGLE_COMPLETE: (todoId, date) =>
+            `/api/todos/${todoId}/dates/${date}/complete`,
+    },
+
+    CATEGORIES: {
+        GET: "/api/categories",
+    },
 };
 
 export default config;
