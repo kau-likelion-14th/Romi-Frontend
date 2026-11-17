@@ -7,7 +7,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+    z-index: 1000;
 }
 
 
@@ -239,12 +239,49 @@
 .leftbutton2 {
     background-color: #e3e3e3;
     border-color: #006EDC;
-    font-color: #006EDC;
+    color: #006EDC;
     cursor: pointer;
 }
 
 .rightbutton {
     background-color: #006EDC;
-    font-color : #ffffff;
+    color: #ffffff;
     cursor: pointer;
+}
+
+.leftbutton:disabled,
+.rightbutton:disabled,
+.routine-row:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-categoryitem span {
+    padding: 6px 14px;
+    border-radius: 100px;
+}
+
+.routine-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #555;
+}
+
+.routine-reset {
+    border: none;
+    background: none;
+    color: #006EDC;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.modal-error {
+    margin: 0;
+    font-size: 14px;
+    color: #FF383C;
 }

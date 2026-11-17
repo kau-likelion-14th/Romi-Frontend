@@ -3,48 +3,77 @@ import "../../styles/Todo.css";
 import "../../styles/TodoModal.css";
 import RoutineModal from "./RoutineModal";
 
-const TodoModal = ({ 
-    isOpen, 
-    onClose, 
-    onSave, 
-    onDelete, 
-    initialTodo,
-    categories = {}
-}) => {
-    const isEditMode = Boolean(initialTodo); 
+const Days = ["월", "화", "수", "목", "금", "토", "일"];
 
-    const [category, setCategory] = useState("공부"); 
+const TodoModal = ({
+    isOpen,
+    onClose,
+    onSave,
+    onDelete,
+    initialTodo,
+    categories = {},
+    isSubmitting = false,
+}) => {
+    const isEditMode = Boolean(initialTodo);
+
+    const [category, setCategory] = useState("");
     const [text, setText] = useState("");
     const [routine, setRoutine] = useState(null);
+    const [error, setError] = useState("");
 
     const [isRoutineModalOpen, setIsRoutineModalOpen] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        setCategory(initialTodo?.category || Object.keys(categories)[0] || "");
+        setCategory(initialTodo?.category || "");
         setText(initialTodo?.text || "");
         setRoutine(initialTodo?.routine || null);
-    }, [isOpen, initialTodo, categories]);
+        setError("");
+        setIsRoutineModalOpen(false);
+    }, [isOpen, initialTodo]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setCategory((prev) => prev || Object.keys(categories)[0] || "");
+    }, [isOpen, categories]);
 
     if (!isOpen) return null;
 
-    const handleSave = () => {
-        if(!text.trim()) return;
+    const handleSave = async () => {
+        if (!text.trim() || !category || isSubmitting) return;
+        setError("");
+        try {
+            await onSave({
+                text: text.trim(),
+                category,
+                routine,
+            });
+        } catch (e) {
+            setError(e.message);
+        }
+    };
 
-        onSave({ 
-            text: text.trim(), 
-            category,
-            routine,
-        });
+    const handleDelete = async () => {
+        if (isSubmitting) return;
+        setError("");
+        try {
+            await onDelete();
+        } catch (e) {
+            setError(e.message);
+        }
+    };
+
+    const handleClose = () => {
+        if (!isSubmitting) onClose();
     };
 
     const categoryKeys = Object.keys(categories);
 
     return (
-        <div className="modal-overlay" onClick={onClose}> 
-            <div 
-                className="modal-container" 
+        <div className="modal-overlay" onClick={handleClose}>
+            <div
+                className="modal-container"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="modal-title">
@@ -59,7 +88,7 @@ const TodoModal = ({
                                 key={c}
                                 className={`modal-categoryitem ${category === c ? 'selected' : ''}`}
                             >
-                                <span style={categories[c]}>{c}</span> 
+                                <span style={categories[c]}>{c}</span>
                                 <input
                                     type="radio"
                                     name="category"
@@ -87,26 +116,43 @@ const TodoModal = ({
                     <button
                         type="button"
                         className="routine-row"
+                        disabled={isSubmitting}
                         onClick={() => setIsRoutineModalOpen(true)}
                     >
-                        <div className="routine-label">루틴 등록하기</div>
+                        <div className="routine-label">{routine ? "루틴 수정하기" : "루틴 등록하기"}</div>
                         <div className="routine-button">{"›"}</div>
                     </button>
+                    {routine && (
+                        <div className="routine-summary">
+                            <span>매주 {Days[routine.repeatDays]} · {routine.startDate} ~ {routine.endDate}</span>
+                            {!isEditMode && (
+                                <button
+                                    type="button"
+                                    className="routine-reset"
+                                    disabled={isSubmitting}
+                                    onClick={() => setRoutine(null)}
+                                >
+                                    루틴 해제
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
+                {error && <p className="modal-error">{error}</p>}
                 <div className="modal-actions">
                     <button
                         className={`leftbutton ${isEditMode ? '' : 'disabled'}`}
-                        onClick={onDelete}
-                        disabled={!isEditMode}
+                        onClick={handleDelete}
+                        disabled={!isEditMode || isSubmitting}
                     >
                         삭제
                     </button>
                     <button
-                        className={`rightbutton ${text.trim() ? '' : 'disabled'}`}
+                        className={`rightbutton ${text.trim() && category ? '' : 'disabled'}`}
                         onClick={handleSave}
-                        disabled={!text.trim()}
+                        disabled={!text.trim() || !category || isSubmitting}
                     >
-                        저장
+                        {isSubmitting ? "저장 중..." : "저장"}
                     </button>
                 </div>
                 <RoutineModal

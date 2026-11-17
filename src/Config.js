@@ -32,7 +32,7 @@ const config = {
 
     TODOS: {
         LIST: "/api/todos",
-        UPDATE: (todoId) => `/api/todos/${todoId}`,
+        DETAIL: (todoId) => `/api/todos/${todoId}`,
         DELETE: (todoId, date) => `/api/todos/${todoId}/dates/${date}`,
         TOGGLE_COMPLETE: (todoId, date) =>
             `/api/todos/${todoId}/dates/${date}/complete`,

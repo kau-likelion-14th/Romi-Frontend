@@ -105,6 +105,16 @@
 }
 
 
+.todo-message {
+    margin: 0;
+    font-size: 15px;
+    color: #8f8f8f;
+}
+
+.todo-error {
+    color: #FF383C;
+}
+
 .todo-category {
     padding: 5px 13px;
     border-radius: 25px;
