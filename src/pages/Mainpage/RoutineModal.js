@@ -12,6 +12,8 @@ const RoutineModal = ({
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [repeatDays, setRepeatDays] = useState(null);
+    const [error, setError] = useState("");
+    const title = initialRoutine ? "루틴 수정하기" : "루틴 등록하기";
 
     useEffect(() => {
         if (!isOpen) return;
@@ -19,11 +21,21 @@ const RoutineModal = ({
         setStartDate(initialRoutine?.startDate || "");
         setEndDate(initialRoutine?.endDate || "");
         setRepeatDays(initialRoutine?.repeatDays ?? null);
+        setError("");
     }, [isOpen, initialRoutine]);
 
     if (!isOpen) return null;
 
     const handleSave = () => {
+        if (!startDate || !endDate || !Number.isInteger(repeatDays)) {
+            setError("시작 날짜, 종료 날짜, 반복 요일을 모두 선택해주세요.");
+            return;
+        }
+        if (startDate > endDate) {
+            setError("종료 날짜는 시작 날짜보다 빠를 수 없습니다.");
+            return;
+        }
+        setError("");
         onSave({
             startDate,
             endDate,
@@ -39,7 +51,7 @@ const RoutineModal = ({
             >
                 <div className="routine-header">
                     <div className="routine-close" onClick={onClose}>{"‹"}</div>
-                    <div className="routine-title">루틴 등록하기</div>
+                    <div className="routine-title">{title}</div>
                 </div>
 
                 <div className="modal-section">
@@ -89,9 +101,7 @@ const RoutineModal = ({
                     </div>
                 </div>
 
-
-                
-               
+                {error && <p className="modal-error">{error}</p>}
 
                 <div className="modal-actions">
                     <button className="leftbutton2" onClick={onClose}>취소</button>

@@ -6,11 +6,25 @@ import config from "../../Config";
 
 const Weeks = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
+const toTodoDetail = (todo) => ({
+    id: todo.todoId,
+    text: todo.description,
+    category: todo.categoryName,
+    routine: todo.routineEnabled
+        ? {
+            startDate: todo.startDate,
+            endDate: todo.endDate,
+            repeatDays: Weeks.indexOf(todo.week),
+        }
+        : null,
+});
+
 const toTodoRequest = ({ text, category, routine }) => {
     const hasRoutine =
         Boolean(routine?.startDate) &&
         Boolean(routine?.endDate) &&
-        Number.isInteger(routine?.repeatDays);
+        Number.isInteger(routine?.repeatDays) &&
+        routine.repeatDays >= 0;
 
     return {
         categoryName: category,
@@ -48,6 +62,14 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
     const [serverCategories, setServerCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        setIsModalOpen(false);
+        setEditingTodo(null);
+        setError("");
+    }, [dateKey]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -74,13 +96,26 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
     }, [serverCategories]);
 
     const openModal = () => {
+        setError("");
         setEditingTodo(null);
         setIsModalOpen(true);
     };
 
-    const openEditModal = (todo) => {
-        setEditingTodo(todo);
-        setIsModalOpen(true);
+    const openEditModal = async (todo) => {
+        setError("");
+        try {
+            const response = await get(config.TODOS.DETAIL(todo.id));
+
+            if (response?.isSuccess === false || !response?.result) {
+                throw new Error(response?.message || "Todo 상세 조회 실패");
+            }
+
+            setEditingTodo({ ...toTodoDetail(response.result), completed: todo.completed });
+            setIsModalOpen(true);
+        } catch (error) {
+            console.error("Todo 상세 조회 실패:", error);
+            setError("할 일 정보를 불러오지 못했습니다. 다시 시도해주세요.");
+        }
     };
 
     const TodoCompleted = (todo) => {
@@ -88,11 +123,13 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
     };
 
     const handledSaveTodo = async ({text, category, routine}) => {
+        if (submitting) return;
+        setSubmitting(true);
         try {
             const body = toTodoRequest({ text, category, routine });
             const response = editingTodo
-                ? await put(config.TODOS.UPDATE(editingTodo.id), body)
-                : await post(`${config.TODOS.LIST}?date=${dateKey}`, body);
+                ? await put(config.TODOS.DETAIL(editingTodo.id), body)
+                : await post(config.TODOS.LIST, body, { params: { date: dateKey } });
 
             if (response?.isSuccess === false) {
                 throw new Error(response?.message || "Todo 저장 실패");
@@ -102,11 +139,15 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
             onChanged?.();
         } catch (error) {
             console.error("Todo 저장 실패:", error);
+            throw new Error(error?.response?.data?.message || "저장하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handledDeleteTodo = async () => {
-        if (!editingTodo) return;
+        if (!editingTodo || submitting) return;
+        setSubmitting(true);
         try {
             const response = await del(config.TODOS.DELETE(editingTodo.id, dateKey));
 
@@ -118,21 +159,20 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
             onChanged?.();
         } catch (error) {
             console.error("Todo 삭제 실패:", error);
+            throw new Error(error?.response?.data?.message || "삭제하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            setSubmitting(false);
         }
     };
-
-    const counts = useMemo(() => {
-        const total = todos.length;
-        const done = todos.filter((t) => t.completed).length;
-        return { total, done };
-    }, [todos]);
 
     return (
         <div className="todo-container">
             <div className="todo-header">
                 <div className="todo-title">To do List</div>
-                <button className="todo-add" onClick={openModal}>+</button> 
+                <button className="todo-add" onClick={openModal}>+</button>
             </div>
+            {error && <p className="todo-message todo-error">{error}</p>}
+            {!error && todos.length === 0 && <p className="todo-message">등록된 할 일이 없습니다.</p>}
             <div className="todo-list">
                 {todos.map((t) => (
                     <div 
@@ -165,6 +205,7 @@ const Todo = ({ selectedDate, todosByDate, onToggle, onChanged }) => {
                 onDelete={handledDeleteTodo}
                 initialTodo={editingTodo}
                 categories={modalCategories}
+                isSubmitting={submitting}
             />
         </div>
     );
